@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pers.avc.simple.shard.sample.mapper.DataSourceServerConfigMapper">
+
+    <resultMap id="BaseResultMap" type="pers.avc.simple.shard.sample.model.datasource.DataSourceServerConfig">
+        <id column="id" property="id" />
+        <result column="db_host" property="dbHost" />
+        <result column="db_port" property="dbPort" />
+        <result column="db_name" property="dbName" />
+        <result column="db_username" property="dbUsername" />
+        <result column="db_password" property="dbPassword" />
+        <result column="db_conn_parameters" property="dbConnParameters" />
+        <result column="enabled" property="enabled" />
+    </resultMap>
+
+    <select id="listEnabledConfig" resultMap="BaseResultMap">
+        select * from data_source_server_config where enabled=true
+    </select>
+
+</mapper>
