@@ -59,4 +59,15 @@
 		</plugins>
 	</build>
 
+	<distributionManagement>
+		<repository>
+			<id>rdc-releases</id>
+			<url>https://packages.aliyun.com/maven/repository/2090516-release-EST2yB/</url>
+		</repository>
+		<snapshotRepository>
+			<id>rdc-snapshots</id>
+			<url>https://packages.aliyun.com/maven/repository/2090516-snapshot-eW5t86/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 </project>

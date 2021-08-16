@@ -14,7 +14,6 @@ import pers.avc.simple.shard.configure.datasource.DynamicDataSourceInitializer;
 import pers.avc.simple.shard.configure.datasource.DynamicRoutingDataSource;
 import pers.avc.simple.shard.configure.aspect.DynamicDataSourceCutoverAspect;
 import pers.avc.simple.shard.configure.datasource.DynamicDataSourceOperator;
-import pers.avc.simple.shard.configure.datasource.meta.DataSourceMetaProp;
 import pers.avc.simple.shard.configure.datasource.meta.LoadDataSourceMetaPropFactory;
 import pers.avc.simple.shard.configure.datasource.routing.DataSourceRoutingRuler;
 import pers.avc.simple.shard.configure.datasource.routing.DefaultDataSourceRoutingRuler;

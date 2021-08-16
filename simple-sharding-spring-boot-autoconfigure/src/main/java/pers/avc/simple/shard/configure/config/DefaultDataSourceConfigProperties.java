@@ -16,10 +16,6 @@ public class DefaultDataSourceConfigProperties implements Serializable {
 
     private String driverClassName = "com.mysql.cj.jdbc.Driver";
 
-    private String username;
-
-    private String password;
-
     private String dbHost;
 
     private String dbName;
@@ -54,22 +50,6 @@ public class DefaultDataSourceConfigProperties implements Serializable {
 
     public void setDriverClassName(String driverClassName) {
         this.driverClassName = driverClassName;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getDbHost() {
