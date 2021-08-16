@@ -36,9 +36,13 @@
 - **配置默认数据源**
 
   ```properties
-  default.datasource.url=jdbc:mysql://localhost:3306/improve?useSSL=false&useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&autoReconnect=true&serverTimezone=Asia/Shanghai
-  default.datasource.username=root
-  default.datasource.password=xxxx
+  # 默认数据源连接信息
+  default.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+  default.datasource.db-host=127.0.0.1
+  default.datasource.db-port=3306
+  default.datasource.db-name=improve
+  default.datasource.db-username=root
+  default.datasource.db-password=authJzao666
   ```
 
 - **激活自动分表**(非必须)

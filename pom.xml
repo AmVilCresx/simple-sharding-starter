@@ -17,7 +17,7 @@
 
 	<groupId>pers.avc.simple.shard</groupId>
 	<artifactId>simple-sharding-starter</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1.RELEASE</version>
 
 	<name>simple-sharding-starter</name>
 	<description>Table Sharding</description>

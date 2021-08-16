@@ -70,7 +70,7 @@ public class TestController {
         dynamicDataSourceOperator.addOne(sourceMetaProp);
 
         System.out.println("即将移除数据源：baseRouter=" +sourceMetaProp.getUnionKey());
-        DataSource oldDs = dynamicDataSourceOperator.remove(sourceMetaProp.getUnionKey());
+        DataSourceMetaProp oldDs = dynamicDataSourceOperator.remove(sourceMetaProp.getUnionKey());
         System.out.println(oldDs);
         return "success";
     }

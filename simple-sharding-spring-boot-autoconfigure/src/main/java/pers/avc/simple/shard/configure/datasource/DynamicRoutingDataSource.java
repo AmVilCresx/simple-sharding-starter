@@ -4,8 +4,10 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import pers.avc.simple.shard.configure.config.DefaultDataSourceConfigProperties;
+import pers.avc.simple.shard.configure.datasource.meta.DataSourceMetaProp;
 import pers.avc.simple.shard.configure.datasource.storage.DataSourceStorage;
 
 import javax.sql.DataSource;
@@ -43,26 +45,22 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
 
     @Override
     protected DataSource determineTargetDataSource() {
-        DataSource ds = dataSourceStorage.take(determineCurrentLookupKey());
-        Objects.requireNonNull(ds, "目标数据源为空，determineCurrentLookupKey="+determineCurrentLookupKey());
-        return ds;
+        DataSourceMetaProp dsMetaInfo = dataSourceStorage.take(String.valueOf(determineCurrentLookupKey()));
+        Objects.requireNonNull(dsMetaInfo, "目标数据源为空，determineCurrentLookupKey="+determineCurrentLookupKey());
+        return DynamicDataSourceOperator.buildDynamicDataSource(dsMetaInfo);
     }
 
     @Override
     public void afterPropertiesSet() {
-        Map<Object, DataSource> dataSourceMap = new HashMap<>();
+        Map<Object, DataSourceMetaProp> dataSourceMap = new HashMap<>();
         dataSourceMap.put(determineCurrentLookupKey(), defaultDataSource());
         dataSourceStorage.storage(dataSourceMap);
     }
 
-    private DataSource defaultDataSource() {
-        LOGGER.info("构建默认数据源....");
-        HikariConfig jdbcConfig = new HikariConfig();
-        jdbcConfig.setPoolName(getClass().getName());
-        jdbcConfig.setDriverClassName(defaultDataSourceConfigProperties.getDriverClassName());
-        jdbcConfig.setJdbcUrl(defaultDataSourceConfigProperties.getUrl());
-        jdbcConfig.setUsername(defaultDataSourceConfigProperties.getUsername());
-        jdbcConfig.setPassword(defaultDataSourceConfigProperties.getPassword());
-        return new HikariDataSource(jdbcConfig);
+    private DataSourceMetaProp defaultDataSource() {
+        LOGGER.info("构建默认数据源信息....");
+        DataSourceMetaProp sourceMetaProp = new DataSourceMetaProp();
+        BeanUtils.copyProperties(defaultDataSourceConfigProperties, sourceMetaProp);
+        return sourceMetaProp;
     }
 }

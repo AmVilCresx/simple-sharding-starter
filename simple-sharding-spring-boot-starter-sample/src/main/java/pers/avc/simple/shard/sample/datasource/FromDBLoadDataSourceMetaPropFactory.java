@@ -38,6 +38,11 @@ public class FromDBLoadDataSourceMetaPropFactory implements LoadDataSourceMetaPr
             metaProp.setDbName(config.getDbName());
             metaProp.setDbUsername(config.getDbUsername());
             metaProp.setDbPassword(config.getDbPassword());
+            metaProp.setConnectionTimeout(config.getConnectionTimeout());
+            metaProp.setAutoCommit(config.getAutoCommit());
+            metaProp.setMaxLifetime(config.getMaxLifetime());
+            metaProp.setMaxPoolSize(config.getMaxPoolSize());
+            metaProp.setMinIdle(config.getMinIdle());
             metaProp.setDbConnParameters(config.getDbConnParameters());
            return metaProp;
         }).collect(Collectors.toList());

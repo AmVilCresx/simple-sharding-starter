@@ -14,6 +14,7 @@ import pers.avc.simple.shard.configure.datasource.DynamicDataSourceInitializer;
 import pers.avc.simple.shard.configure.datasource.DynamicRoutingDataSource;
 import pers.avc.simple.shard.configure.aspect.DynamicDataSourceCutoverAspect;
 import pers.avc.simple.shard.configure.datasource.DynamicDataSourceOperator;
+import pers.avc.simple.shard.configure.datasource.meta.DataSourceMetaProp;
 import pers.avc.simple.shard.configure.datasource.meta.LoadDataSourceMetaPropFactory;
 import pers.avc.simple.shard.configure.datasource.routing.DataSourceRoutingRuler;
 import pers.avc.simple.shard.configure.datasource.routing.DefaultDataSourceRoutingRuler;
@@ -81,7 +82,7 @@ public class SimpleShardingAutoConfiguration {
         @Bean
         @ConditionalOnMissingBean
         @Primary // 不需要也是可以的，为了消除 idea 警告
-        public DataSourceStorage dataSourceStorage() {
+        public DataSourceStorage<String> dataSourceStorage() {
             return new InMemoryDataSourceStorage();
         }
 

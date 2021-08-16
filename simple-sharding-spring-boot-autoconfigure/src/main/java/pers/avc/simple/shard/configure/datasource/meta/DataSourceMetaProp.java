@@ -1,6 +1,7 @@
 package pers.avc.simple.shard.configure.datasource.meta;
 
 import org.springframework.util.StringUtils;
+import pers.avc.simple.shard.configure.common.SimpleShardingConstants;
 
 import java.io.Serializable;
 
@@ -10,8 +11,6 @@ import java.io.Serializable;
  * @author <a href="mailto:jzaofox@foxmai.com">AmVilCresx</a>
  */
 public class DataSourceMetaProp implements Serializable {
-
-    private final static String MYSQL_PARAMS_SUFFIX = "?useSSL=false&useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&autoReconnect=true&serverTimezone=Asia/Shanghai";
 
     /**
      * 用于路由，做唯一标识，不可重复
@@ -30,10 +29,20 @@ public class DataSourceMetaProp implements Serializable {
 
     private String dbPassword;
 
+    private Long connectionTimeout;
+
+    private Integer minIdle;
+
+    private Integer maxPoolSize;
+
+    private Long maxLifetime;
+
+    private Boolean isAutoCommit;
+
     /**
      * 连接后面跟的参数
      *
-     * @see #MYSQL_PARAMS_SUFFIX
+     * @see SimpleShardingConstants#MYSQL_PARAMS_SUFFIX
      */
     private String dbConnParameters;
 
@@ -93,8 +102,54 @@ public class DataSourceMetaProp implements Serializable {
         this.dbPassword = dbPassword;
     }
 
+    public Long getConnectionTimeout() {
+        return connectionTimeout;
+    }
+
+    public void setConnectionTimeout(Long connectionTimeout) {
+        this.connectionTimeout = connectionTimeout;
+    }
+
+    public Integer getMinIdle() {
+        return minIdle;
+    }
+
+    public void setMinIdle(Integer minIdle) {
+        this.minIdle = minIdle;
+    }
+
+    public Integer getMaxPoolSize() {
+        return maxPoolSize;
+    }
+
+    public void setMaxPoolSize(Integer maxPoolSize) {
+        this.maxPoolSize = maxPoolSize;
+    }
+
+    public Long getMaxLifetime() {
+        return maxLifetime;
+    }
+
+    public void setMaxLifetime(Long maxLifetime) {
+        this.maxLifetime = maxLifetime;
+    }
+
+    public Boolean getAutoCommit() {
+        return isAutoCommit;
+    }
+
+    public void setAutoCommit(Boolean autoCommit) {
+        isAutoCommit = autoCommit;
+    }
+
     public String getDbConnParameters() {
-        return StringUtils.hasText(dbConnParameters) ? "?" + dbConnParameters : MYSQL_PARAMS_SUFFIX;
+        if (StringUtils.hasText(dbConnParameters)) {
+            if (dbConnParameters.startsWith("?")) {
+                return dbConnParameters;
+            }
+            return "?" + dbConnParameters;
+        }
+        return SimpleShardingConstants.MYSQL_PARAMS_SUFFIX;
     }
 
     public void setDbConnParameters(String dbConnParameters) {

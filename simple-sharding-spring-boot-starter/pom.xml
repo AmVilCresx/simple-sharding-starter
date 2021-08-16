@@ -5,7 +5,7 @@
     <parent>
         <groupId>pers.avc.simple.shard</groupId>
         <artifactId>simple-sharding-starter</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.1.RELEASE</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,7 +15,7 @@
         <dependency>
             <groupId>pers.avc.simple.shard</groupId>
             <artifactId>simple-sharding-spring-boot-autoconfigure</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.1.RELEASE</version>
         </dependency>
     </dependencies>
 
