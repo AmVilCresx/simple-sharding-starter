@@ -15,7 +15,7 @@ import java.util.Map;
  *
  * @author <a href="mailto:jzaofox@foxmail.com">AmVilCresx</a>
  */
-//@Component
+@Component
 public class RedisDataSourceStorage implements DataSourceStorage<String> {
 
     @Autowired

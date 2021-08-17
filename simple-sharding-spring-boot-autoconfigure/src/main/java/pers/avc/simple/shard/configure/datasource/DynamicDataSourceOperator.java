@@ -1,5 +1,6 @@
 package pers.avc.simple.shard.configure.datasource;
 
+import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -7,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
+import pers.avc.simple.shard.configure.datasource.event.RemoveDataSourceEvent;
 import pers.avc.simple.shard.configure.datasource.meta.DataSourceMetaProp;
 import pers.avc.simple.shard.configure.datasource.routing.DataSourceRoutingRuler;
 import pers.avc.simple.shard.configure.common.SimpleShardingConstants;
@@ -44,9 +46,7 @@ public class DynamicDataSourceOperator {
         }
 
         Map<Object, DataSourceMetaProp> targetMap = new HashMap<>();
-        dataSourceMetaProps.forEach(prop -> {
-            targetMap.put(dataSourceRoutingRuler.rule(prop.getUnionKey()), prop);
-        });
+        dataSourceMetaProps.forEach(prop -> targetMap.put(dataSourceRoutingRuler.rule(prop.getUnionKey()), prop));
         dataSourceStorage.storage(targetMap);
     }
 
@@ -55,8 +55,8 @@ public class DynamicDataSourceOperator {
         try {
             LOGGER.info("单个添加动态数据源：" + JSONUtil.toJsonStr(metaProp));
             String sKey = dataSourceRoutingRuler.rule(metaProp.getUnionKey());
-            Map<String, HikariDataSource> ds = new HashMap<>();
-            ds.put(sKey, buildDynamicDataSource(metaProp));
+            Map<String, DataSourceMetaProp> ds = new HashMap<>();
+            ds.put(sKey, metaProp);
             dataSourceStorage.storage(ds);
         } catch (Exception e) {
             LOGGER.error("添加动态数据源异常:", e);
@@ -69,6 +69,8 @@ public class DynamicDataSourceOperator {
         LOGGER.info("移除动态数据源：" + baseRouter);
         try {
             String sKey = dataSourceRoutingRuler.rule(baseRouter);
+            // 发送事件，通知 LRU 移除该数据源
+            SpringUtil.getApplicationContext().publishEvent(new RemoveDataSourceEvent(sKey));
             return dataSourceStorage.remove(sKey);
         } catch (Exception e) {
             LOGGER.error("移除动态数据源:", e);

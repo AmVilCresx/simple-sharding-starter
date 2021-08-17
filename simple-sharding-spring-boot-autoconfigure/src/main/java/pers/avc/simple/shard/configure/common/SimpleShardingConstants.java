@@ -12,4 +12,6 @@ public interface SimpleShardingConstants {
     String POINT = ".";
 
     String MYSQL_PARAMS_SUFFIX = "?useSSL=false&useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&autoReconnect=true&serverTimezone=Asia/Shanghai";
+
+    String LEFT_BRACKET = "(";
 }

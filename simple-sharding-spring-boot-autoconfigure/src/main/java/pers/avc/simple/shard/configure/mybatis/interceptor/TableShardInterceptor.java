@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static pers.avc.simple.shard.configure.common.SimpleShardingConstants.LEFT_BRACKET;
 import static pers.avc.simple.shard.configure.common.SimpleShardingConstants.POINT;
 
 /**
@@ -89,8 +90,10 @@ public class TableShardInterceptor implements Interceptor {
         LOGGER.debug(mappedStatement.getSqlCommandType() + " 处理之前的SQL: " + sqlStr);
         for (String tableName : tableNames) {
             boolean suffixBlank = !sqlStr.endsWith(tableName);
-            // 原始表名.字段名 ====》 新表名.字段名，如： t_user.name ===> t.user_xxx.name
+            // 原始表名.字段名 ====》 新表名.字段名，如： t_user.name ===> t_user_xxx.name
             sqlStr = sqlStr.replace(tableName + POINT, shardStrategy.finalTableName(tableName) + POINT);
+            // 原始表名( ====》 新表名(，如： insert into t_user( ===> insert into t_user_xxx(
+            sqlStr = sqlStr.replace(tableName + LEFT_BRACKET, shardStrategy.finalTableName(tableName) + LEFT_BRACKET);
             sqlStr = sqlStr.replace(fillUpBlank(tableName, suffixBlank), fillUpBlank(shardStrategy.finalTableName(tableName), suffixBlank));
         }
         LOGGER.debug(mappedStatement.getSqlCommandType() + " 处理之后的SQL：" + sqlStr);

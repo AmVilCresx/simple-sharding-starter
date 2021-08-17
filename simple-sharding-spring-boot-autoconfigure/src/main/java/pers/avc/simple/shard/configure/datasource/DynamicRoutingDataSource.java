@@ -1,12 +1,17 @@
 package pers.avc.simple.shard.configure.datasource;
 
+import cn.hutool.cache.impl.LRUCache;
+import cn.hutool.json.JSONUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
+import org.springframework.util.StringUtils;
 import pers.avc.simple.shard.configure.config.DefaultDataSourceConfigProperties;
+import pers.avc.simple.shard.configure.datasource.event.RemoveDataSourceEvent;
 import pers.avc.simple.shard.configure.datasource.meta.DataSourceMetaProp;
 import pers.avc.simple.shard.configure.datasource.storage.DataSourceStorage;
 
@@ -29,6 +34,8 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
 
     private DefaultDataSourceConfigProperties defaultDataSourceConfigProperties;
 
+    private final LRUCache<String, DataSource> DATASOURCE_CACHE = new LRUCache<>(128);
+
     public void setDefaultDataSourceConfig(DefaultDataSourceConfigProperties defaultDataSourceConfigProperties) {
         this.defaultDataSourceConfigProperties = defaultDataSourceConfigProperties;
     }
@@ -45,9 +52,15 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
 
     @Override
     protected DataSource determineTargetDataSource() {
-        DataSourceMetaProp dsMetaInfo = dataSourceStorage.take(String.valueOf(determineCurrentLookupKey()));
+        String lookUpKey = String.valueOf(determineCurrentLookupKey());
+        DataSourceMetaProp dsMetaInfo = dataSourceStorage.take(lookUpKey);
         Objects.requireNonNull(dsMetaInfo, "目标数据源为空，determineCurrentLookupKey="+determineCurrentLookupKey());
-        return DynamicDataSourceOperator.buildDynamicDataSource(dsMetaInfo);
+        if (DATASOURCE_CACHE.containsKey(lookUpKey)) {
+            return DATASOURCE_CACHE.get(lookUpKey);
+        }
+        HikariDataSource dataSource = DynamicDataSourceOperator.buildDynamicDataSource(dsMetaInfo);
+        DATASOURCE_CACHE.put(lookUpKey, dataSource);
+        return dataSource;
     }
 
     @Override
@@ -62,5 +75,15 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
         DataSourceMetaProp sourceMetaProp = new DataSourceMetaProp();
         BeanUtils.copyProperties(defaultDataSourceConfigProperties, sourceMetaProp);
         return sourceMetaProp;
+    }
+
+
+    @EventListener(value = RemoveDataSourceEvent.class)
+    public void removeDataSourceEventListener(RemoveDataSourceEvent dataSourceEvent) {
+        if (Objects.isNull(dataSourceEvent) || !StringUtils.hasText(dataSourceEvent.getLookUpKey())) {
+            LOGGER.warn("移除数据源事件对象不合法:dataSourceEvent=" + JSONUtil.toJsonStr(dataSourceEvent));
+            return;
+        }
+        DATASOURCE_CACHE.remove(dataSourceEvent.getLookUpKey());
     }
 }
