@@ -11,19 +11,21 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.4.1</version>
+		<version>2.5.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
 	<groupId>pers.avc.simple.shard</groupId>
 	<artifactId>simple-sharding-starter</artifactId>
-	<version>0.0.1.RELEASE</version>
+	<version>${sharding.version}</version>
 
 	<name>simple-sharding-starter</name>
 	<description>Table Sharding</description>
 	<properties>
 		<java.version>1.8</java.version>
+		<sharding.version>1.0.0</sharding.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
             <groupId>cn.hutool</groupId>

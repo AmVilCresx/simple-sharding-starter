@@ -5,7 +5,7 @@
     <parent>
         <artifactId>simple-sharding-starter</artifactId>
         <groupId>pers.avc.simple.shard</groupId>
-        <version>0.0.1.RELEASE</version>
+        <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,6 +13,7 @@
 
     <properties>
         <mybatis-spring-boot.version>2.1.4</mybatis-spring-boot.version>
+        <jsqlparser.version>4.7</jsqlparser.version>
     </properties>
     <dependencies>
         <dependency>
@@ -40,6 +41,12 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+            <version>${jsqlparser.version}</version>
         </dependency>
     </dependencies>
 

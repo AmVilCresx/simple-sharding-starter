@@ -19,4 +19,6 @@ public interface ArtUserImproveMapper extends BaseMapper<ArtUserImprove> {
     ArtUserImprove selectById(@Param("id") Long id);
 
     void deleteById(@Param("id") Long id);
+
+    void updateByPrimaryKey(@Param("id") Long id);
 }

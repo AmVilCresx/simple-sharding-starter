@@ -33,8 +33,10 @@ public class TestController {
      * @return String
      */
     @GetMapping("/testDynamic")
-    @TargetDataSource
-    public String testDynamic(@CutoverDBParam String id, String flag) {
+  //  @TargetDataSource
+    public String testDynamic(
+            // @CutoverDBParam
+                                          String id, String flag) {
         //   DataSourceContextHolder.set(1+""); // 手动切数据源
         if (Objects.equals("select", flag)) {
             ArtUserImprove userImprove = artUserImproveMapper.selectById(1L);
@@ -48,10 +50,7 @@ public class TestController {
         }
 
         if (Objects.equals("update", flag)) {
-            ArtUserImprove userImprove = new ArtUserImprove();
-            userImprove.setId(1L);
-            userImprove.setFirstName("啊啊啊啊");
-            artUserImproveMapper.updateById(userImprove);
+            artUserImproveMapper.updateByPrimaryKey(1L);
         }
         return "success";
     }

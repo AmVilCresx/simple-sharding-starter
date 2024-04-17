@@ -1,8 +1,13 @@
 package pers.avc.simple.shard.configure.mybatis.interceptor;
 
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ReflectUtil;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.Statement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -11,16 +16,14 @@ import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.util.StringUtils;
-import pers.avc.simple.shard.configure.mybatis.interceptor.strategy.ITableShardStrategy;
+import pers.avc.simple.shard.configure.datasource.TableNameReplacer;
 import pers.avc.simple.shard.configure.mybatis.annotation.TableShard;
+import pers.avc.simple.shard.configure.mybatis.interceptor.strategy.ITableShardStrategy;
 import pers.avc.simple.shard.configure.mybatis.interceptor.strategy.NonTableShardStrategy;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static pers.avc.simple.shard.configure.common.SimpleShardingConstants.LEFT_BRACKET;
-import static pers.avc.simple.shard.configure.common.SimpleShardingConstants.POINT;
 
 /**
  * 利用Mybatis 拦截器实现简单的分表操作
@@ -31,12 +34,11 @@ import static pers.avc.simple.shard.configure.common.SimpleShardingConstants.POI
         {
                 @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class}),
                 @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
+                @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class}),
         })
 public class TableShardInterceptor implements Interceptor {
 
     private static final Log LOGGER = LogFactory.getLog(TableShardInterceptor.class);
-
-    private static final Pattern SQL_PATTERN = Pattern.compile("\\s+|\t|\r|\n");
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -83,21 +85,18 @@ public class TableShardInterceptor implements Interceptor {
             return null;
         }
 
-        ITableShardStrategy shardStrategy = shardStrategyClass.newInstance();
+        ITableShardStrategy shardStrategy = ReflectUtil.newInstance(shardStrategyClass);
         BoundSql boundSql = mappedStatement.getSqlSource().getBoundSql(invocation.getArgs()[1]);
-        // 处理不可见字符（制表符、回车、换行）
-        String sqlStr = adjustSql(boundSql.getSql());
+        // 原Sql
+        String sqlStr = boundSql.getSql();
         LOGGER.debug(mappedStatement.getSqlCommandType() + " 处理之前的SQL: " + sqlStr);
+        Map<String, String> replaceNameMappings = new HashMap<>(tableNames.length);
         for (String tableName : tableNames) {
-            boolean suffixBlank = !sqlStr.endsWith(tableName);
-            // 原始表名.字段名 ====》 新表名.字段名，如： t_user.name ===> t_user_xxx.name
-            sqlStr = sqlStr.replace(tableName + POINT, shardStrategy.finalTableName(tableName) + POINT);
-            // 原始表名( ====》 新表名(，如： insert into t_user( ===> insert into t_user_xxx(
-            sqlStr = sqlStr.replace(tableName + LEFT_BRACKET, shardStrategy.finalTableName(tableName) + LEFT_BRACKET);
-            sqlStr = sqlStr.replace(fillUpBlank(tableName, suffixBlank), fillUpBlank(shardStrategy.finalTableName(tableName), suffixBlank));
+            replaceNameMappings.put(tableName, shardStrategy.finalTableName(tableName));
         }
-        LOGGER.debug(mappedStatement.getSqlCommandType() + " 处理之后的SQL：" + sqlStr);
-        return sqlStr;
+        String newSqlStr = regenerateNewSql(sqlStr, replaceNameMappings);
+        LOGGER.debug(mappedStatement.getSqlCommandType() + " 处理之后的SQL：" + newSqlStr);
+        return newSqlStr;
     }
 
 
@@ -111,27 +110,10 @@ public class TableShardInterceptor implements Interceptor {
         }
     }
 
-    /**
-     * 表名前后的空格处理，防止跟字段名冲突
-     *
-     * @param tabName     数据库表名
-     * @param suffixBlank 是否需要给后面追加空格， 如果以表名结尾，那就不需要了
-     * @return " "+表名 + " "
-     */
-    private String fillUpBlank(String tabName, boolean suffixBlank) {
-        String newTableName = " " + tabName;
-        return suffixBlank ? newTableName + " " : newTableName;
-    }
-
-    /**
-     * 调整SQL，去掉 制表符、回车、换行等不可见字符串, 拉伸成一个长字符串
-     *
-     * @param sql 原始SQL
-     * @return 处理之后的SQL
-     */
-    private static String adjustSql(String sql) {
-        Matcher m = SQL_PATTERN.matcher(sql);
-        return m.replaceAll(" ");
+    private String regenerateNewSql(String originalSql, Map<String, String> replaceNameMappings) throws JSQLParserException {
+        Statement statement = CCJSqlParserUtil.parse(originalSql);
+        TableNameReplacer nameReplacer = new TableNameReplacer(replaceNameMappings);
+        return nameReplacer.generateNewSqlStr(statement);
     }
 
     private MappedStatement copyFromMappedStatement(MappedStatement ms, SqlSource newSqlSource) {

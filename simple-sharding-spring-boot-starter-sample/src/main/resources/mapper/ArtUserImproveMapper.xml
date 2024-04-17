@@ -5,7 +5,7 @@
 <mapper namespace="pers.avc.simple.shard.sample.mapper.ArtUserImproveMapper">
 
     <select id="selectById" resultType="pers.avc.simple.shard.sample.model.ArtUserImprove">
-        select art_user_improve.* from
+        select * from
         art_user_improve
         where id= #{id}
     </select>
@@ -13,4 +13,8 @@
     <delete id="deleteById">
         delete from art_user_improve where id = #{id}
     </delete>
+
+    <update id="updateByPrimaryKey">
+        update art_user_improve set avatar='abc' where id = #{id}
+    </update>
 </mapper>
