@@ -22,67 +22,29 @@
     <build>
         <finalName>simple-sharding-spring-boot-starter</finalName>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <!-- 此为打jar时的配置主函数执行入口 如果是war包，可不配置-->
-                    <mainClass />
-                </configuration>
-                <!-- 如果是war包，可不配置-->
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- 将源码打包 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <!-- get all project dependencies -->
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-                <executions>
-                    <!-- 配置执行器 -->
-                    <execution>
-                        <id>make-assembly</id>
-                        <!-- 绑定到package命令的生命周期上 -->
-                        <phase>package</phase>
-                        <goals>
-                            <!-- 只运行一次 -->
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-assembly-plugin</artifactId>-->
+<!--                <version>3.2.0</version>-->
+<!--                <configuration>-->
+<!--                    &lt;!&ndash; get all project dependencies &ndash;&gt;-->
+<!--                    <descriptorRefs>-->
+<!--                        <descriptorRef>jar-with-dependencies</descriptorRef>-->
+<!--                    </descriptorRefs>-->
+<!--                </configuration>-->
+<!--                <executions>-->
+<!--                    &lt;!&ndash; 配置执行器 &ndash;&gt;-->
+<!--                    <execution>-->
+<!--                        <id>make-assembly</id>-->
+<!--                        &lt;!&ndash; 绑定到package命令的生命周期上 &ndash;&gt;-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            &lt;!&ndash; 只运行一次 &ndash;&gt;-->
+<!--                            <goal>single</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 
